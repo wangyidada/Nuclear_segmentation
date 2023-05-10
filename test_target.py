@@ -1,9 +1,9 @@
-import numpy as np
 import os
 import torch
 from utils.Dataset_seg2D import make_test_loader
 from Models.attention_unet import AttU_Net, AttU_Net_TF
 from Dataset_target import get_data
+import numpy as np
 
 
 def test(index_path, model, data_modes, roi_modes, input_shape, save_folder=None):
@@ -14,9 +14,6 @@ def test(index_path, model, data_modes, roi_modes, input_shape, save_folder=None
         test_loader = make_test_loader(data_root, data_modes, roi_modes, case, input_shape, get_data, batch_size=1)
         with torch.no_grad():
             for batch_x, batch_y in test_loader:
-                # x = batch_x.numpy()
-                # plt.imshow(x[0, 0, ...], cmap='gray')
-                # plt.show()
                 batch_x = batch_x.cuda(0)
                 output = model(batch_x)[0]
                 output = torch.nn.functional.softmax(output, dim=1)
@@ -26,12 +23,6 @@ def test(index_path, model, data_modes, roi_modes, input_shape, save_folder=None
                 pred.append(seg_slice)
         pred = np.asarray(pred, dtype=np.float32)
         pred = np.transpose(pred, [1, 2, 0, 3])
-        # print(pred.shape)
-        # Imshow3DArray(pred[..., 0])
-        # Imshow3DArray(pred[..., 1])
-        # Imshow3DArray(pred[..., 2])
-        # Imshow3DArray(pred[..., 3])
-
 
         if save_folder is not None:
             save_path = os.path.join(save_folder, case)
@@ -42,10 +33,14 @@ def test(index_path, model, data_modes, roi_modes, input_shape, save_folder=None
 
 
 if __name__ == '__main__':
-    model_path = r'/home/wyd/PycharmProjects/ZWW_seg/High_wo_TF/log/model/Epoch100_best_model.pth'
-    save_folder = r'/home/wyd/PycharmProjects/ZWW_seg/High_wo_TF_data'
-    data_root = r'/home/wyd/PycharmProjects/ZWW_seg/data/High'
-    index_path = r'/home/wyd/PycharmProjects/ZWW_seg/data/High_index/index/test_index.npy'
+    model_path = r'./trained_models/fode0_model.pth'
+    # model_path = r'./trained_models/fode1_model.pth'
+    # model_path = r'./trained_models/fode2_model.pth'
+    # model_path = r'./trained_models/fode3_model.pth'
+    # model_path = r'./trained_models/fode4_model.pth'
+    save_folder = r'./save_folder/fode0'
+    data_root = r'./data_folder'
+    index_path = r'./index/test_index.npy'
     data_modes = ['qsm.npy']
     roi_modes = ['ROI.npy']
     input_shape = (96, 96)
